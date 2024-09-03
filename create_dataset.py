@@ -3,11 +3,11 @@ import mediapipe as mp
 import numpy as np
 import time, os
 
-actions = ['come', 'away', 'spin']
-seq_length = 30
-secs_for_action = 30
+actions = ['come', 'away', 'spin'] #각각 0, 1, 2에 매칭
+seq_length = 30 #윈도우의 크기
+secs_for_action = 30 #데이터셋 모집 시 측정 시간(촬영 시간)
 
-# MediaPipe hands model
+# MediaPipe hands model initialization
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
@@ -15,7 +15,7 @@ hands = mp_hands.Hands(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0) #webcam 초기화
 
 created_time = int(time.time())
 os.makedirs('dataset', exist_ok=True)
@@ -63,9 +63,9 @@ while cap.isOpened():
                     angle = np.degrees(angle) # Convert radian to degree
 
                     angle_label = np.array([angle], dtype=np.float32)
-                    angle_label = np.append(angle_label, idx)
+                    angle_label = np.append(angle_label, idx) #idx : 0, 1, 2 라벨 넣어주기
 
-                    d = np.concatenate([joint.flatten(), angle_label])
+                    d = np.concatenate([joint.flatten(), angle_label]) #100개짜리 행렬
 
                     data.append(d)
 
@@ -75,9 +75,9 @@ while cap.isOpened():
             if cv2.waitKey(1) == ord('q'):
                 break
 
-        data = np.array(data)
+        data = np.array(data) #numpy array형태로 저장
         print(action, data.shape)
-        np.save(os.path.join('dataset', f'raw_{action}_{created_time}'), data)
+        np.save(os.path.join('dataset', f'raw_{action}_{created_time}'), data) #npy데이터로 저장
 
         # Create sequence data
         full_seq_data = []
